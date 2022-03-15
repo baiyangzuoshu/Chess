@@ -20,6 +20,8 @@ export  class   Piece
     }
 
     public  isCanWalk(p:cc.Vec2):boolean{
+        if(p.x<0||p.y<0||p.x>GAME_ENUM.PIECE_MAX_X||p.y>GAME_ENUM.PIECE_MAX_Y)return false
+        
         switch(this._id)
         {
             case PIECE_ID.ZU:

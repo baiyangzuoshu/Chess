@@ -41,6 +41,35 @@ export  class   DataManager
         return null
     }
 
+    public  getP2PNumber(p1:cc.Vec2,p2:cc.Vec2):number{
+        if(p1.x==p2.x&&p1.y==p2.y)return -1;
+        if(p1.x!=p2.x&&p1.y!=p2.y)return -1;
+        
+        let ret=0;
+        if(p1.x==p2.x)
+        {
+            let min=Math.min(p1.y,p2.y)
+            let max=Math.max(p1.y,p2.y)
+            for(let i=min+1;i<max;i++)
+            {
+                if(this.getPointPiece(new cc.Vec2(p1.x,i)))
+                    ret++;
+            }
+        }
+        else if(p1.y==p2.y)
+        {
+            let min=Math.min(p1.x,p2.x)
+            let max=Math.max(p1.x,p2.x)
+            for(let i=min+1;i<max;i++)
+            {
+                if(this.getPointPiece(new cc.Vec2(i,p1.y)))
+                    ret++;
+            }
+        }
+
+        return ret;
+    }
+
     public  loadJsonData(jsonData:cc.JsonAsset):void{
         let data:Array<Object>=jsonData.json
         for(let i=0;i<data.length;i++)

@@ -1,3 +1,4 @@
+import { DataManager } from "./dataManager"
 import { GAME_ENUM, PIECE_STATE, PIECE_ID, PIECE_TYPE } from "./enum"
 
 export  class   Piece
@@ -22,35 +23,62 @@ export  class   Piece
         switch(this._id)
         {
             case PIECE_ID.ZU:
-                {
-                    if(p.x==this.getX())
-                    {
-                        return p.y==this.getY()+1
-                    }
-                    else if(p.y==this.getY()){
-                        if(PIECE_TYPE.OWN==this.getType())
-                        {
-                            if(this.getY()<GAME_ENUM.PIECE_OWN_ZU)
-                            {
-                                return false;
-                            }
-                        }
-                        else if(PIECE_TYPE.ENEMY==this.getType())
-                        {
-                            if(this.getY()<GAME_ENUM.PIECE_ENEMY_ZU)
-                            {
-                                return false;
-                            }
-                        }
-
-                        return (p.x==this.getX()+1||p.x==this.getX()-1)
-                    }
-                }
+                return this.isCanWalkZu(p)
+            case PIECE_ID.CHE:
+                return this.isCanWalkChe(p)
+            case PIECE_ID.PAO:
+                return this.isCanWalkPao(p)
             default:
                 break;
             
         }
         return false
+    }
+
+    public  isCanWalkPao(p:cc.Vec2):boolean{
+        let target=DataManager.getInstance().getPointPiece(p);
+
+        let ret=DataManager.getInstance().getP2PNumber(p,new cc.Vec2(this.getX(),this.getY()))
+
+        if(target)
+        {
+            return 1==ret
+        }
+        else
+        {
+            return 0==ret
+        }
+
+        return false;
+    }
+
+    public  isCanWalkChe(p:cc.Vec2):boolean{
+        return DataManager.getInstance().getP2PNumber(p,new cc.Vec2(this.getX(),this.getY()))==0;
+    }
+
+    public  isCanWalkZu(p:cc.Vec2):boolean{
+        if(p.x==this.getX())
+        {
+            return p.y==this.getY()+1
+        }
+        else if(p.y==this.getY()){
+            if(PIECE_TYPE.OWN==this.getType())
+            {
+                if(this.getY()<GAME_ENUM.PIECE_OWN_ZU)
+                {
+                    return false;
+                }
+            }
+            else if(PIECE_TYPE.ENEMY==this.getType())
+            {
+                if(this.getY()<GAME_ENUM.PIECE_ENEMY_ZU)
+                {
+                    return false;
+                }
+            }
+
+            return (p.x==this.getX()+1||p.x==this.getX()-1)
+        }
     }
 
     public  die():void{

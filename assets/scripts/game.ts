@@ -6,7 +6,7 @@
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
 import { DataManager } from "./dataManager"
-import { GAME_ENUM } from "./enum"
+import { GAME_ENUM, PIECE_TYPE } from "./enum"
 
 const {ccclass, property} = cc._decorator
 
@@ -68,7 +68,7 @@ export default class NewClass extends cc.Component {
                     this.showSelectedNode(transformPos)
                 }
             }
-            else if(prePiece.isCanWalk(transformPos))//前进
+            else if(prePiece.isCanWalk(transformPos)&&PIECE_TYPE.OWN==prePiece.getType())//前进
             {
                 prePiece.setX(transformPos.x)
                 prePiece.setY(transformPos.y)

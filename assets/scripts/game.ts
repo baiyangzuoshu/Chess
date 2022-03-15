@@ -52,15 +52,30 @@ export default class NewClass extends cc.Component {
 
         let prePiece=DataManager.getInstance().getPointPiece(selectedPos)
         let curPiece=DataManager.getInstance().getPointPiece(transformPos)
-        console.log(prePiece,curPiece)
         if(prePiece&&this.selectedNode.active)//上一步选中棋子
         {
-            prePiece.setX(transformPos.x)
-            prePiece.setY(transformPos.y)
-            this.hideSelectedNode()
+            if(curPiece)
+            {
+                if(prePiece.getType()!=curPiece.getType()&&prePiece.isCanWalk(transformPos))//吃对方棋子
+                {
+                    curPiece.die()
+                    prePiece.setX(transformPos.x)
+                    prePiece.setY(transformPos.y)
+                    this.hideSelectedNode()
+                }
+                else
+                {
+                    this.showSelectedNode(transformPos)
+                }
+            }
+            else if(prePiece.isCanWalk(transformPos))//前进
+            {
+                prePiece.setX(transformPos.x)
+                prePiece.setY(transformPos.y)
+                this.hideSelectedNode()
+            }
         }
         else{
-            
             this.showSelectedNode(transformPos)
         }
     }

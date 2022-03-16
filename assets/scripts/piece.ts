@@ -21,7 +21,7 @@ export  class   Piece
 
     public  isCanWalk(p:cc.Vec2):boolean{
         if(p.x<0||p.y<0||p.x>GAME_ENUM.PIECE_MAX_X||p.y>GAME_ENUM.PIECE_MAX_Y)return false
-        
+
         switch(this._id)
         {
             case PIECE_ID.ZU:
@@ -30,10 +30,105 @@ export  class   Piece
                 return this.isCanWalkChe(p)
             case PIECE_ID.PAO:
                 return this.isCanWalkPao(p)
+            case PIECE_ID.MA:
+                return this.isCanWalkMa(p)
+            case PIECE_ID.XIANG:
+                return this.isCanWalkXiang(p)
+            case PIECE_ID.SHI:
+                return this.isCanWalkShi(p)
+            case PIECE_ID.JIANG:
+                return this.isCanWalkJiang(p)
             default:
                 break;
             
         }
+        return false
+    }
+
+    public  isShiAndJiangBorder(p:cc.Vec2):boolean{
+        if(p.x<GAME_ENUM.PIECE_XHI_JIANG_MINX||p.x>GAME_ENUM.PIECE_XHI_JIANG_MAXX)
+            return true
+
+        if(PIECE_TYPE.OWN==this.getType())
+        {
+            if(p.y>GAME_ENUM.PIECE_SHI_JIANG_MAXY)return true
+        }
+        else{
+            if(p.y<GAME_ENUM.PIECE_MAX_Y-GAME_ENUM.PIECE_SHI_JIANG_MAXY)return true
+        }
+
+        return false
+    }
+
+    public  isCanWalkJiang(p:cc.Vec2):boolean{
+        if(this.isShiAndJiangBorder(p))
+        {
+            return false
+        }
+
+        let x=Math.abs(p.x-this.getX())
+        let y=Math.abs(p.y-this.getY())
+        let ret=10*x+y
+        return 10==ret||1==ret
+    }
+
+    public  isCanWalkShi(p:cc.Vec2):boolean{
+        if(this.isShiAndJiangBorder(p))
+        {
+            return false
+        }
+
+        let x=Math.abs(p.x-this.getX())
+        let y=Math.abs(p.y-this.getY())
+        let ret=10*x+y
+        return 11==ret
+    }
+
+    public  isCanWalkXiang(p:cc.Vec2):boolean{
+        //检查越界
+        if(PIECE_TYPE.OWN==this.getType())
+        {
+            if(p.y>GAME_ENUM.PIECE_XIANG_MAXY)return false
+        }
+        else{
+            if(p.y<=GAME_ENUM.PIECE_XIANG_MAXY)return false
+        }
+
+        let x=p.x-this.getX()
+        let y=p.y-this.getY()
+        let ret=Math.abs(x*100+y)
+        if(198!=ret&&202!=ret)
+        {
+            return false
+        }
+        //蹩脚
+        let targetX=(p.x+this.getX())/2
+        let targetY=(p.y+this.getY())/2
+        let target=DataManager.getInstance().getPointPiece(new cc.Vec2(targetX,targetY))
+        return null==target
+    }
+
+    public  isCanWalkMa(p:cc.Vec2):boolean{
+        let x=Math.abs(p.x-this.getX())
+        let y=Math.abs(p.y-this.getY())
+        let ret=x*10+y;
+        if(21==ret)//x轴
+        {
+            //蹩脚
+            let targetX=(p.x+this.getX())/2
+            let targetY=this.getY()
+            let target=DataManager.getInstance().getPointPiece(new cc.Vec2(targetX,targetY))
+            return null==target
+        }
+        else if(12==ret)//y轴
+        {
+            //蹩脚
+            let targetX=this.getX()
+            let targetY=(p.y+this.getY())/2
+            let target=DataManager.getInstance().getPointPiece(new cc.Vec2(targetX,targetY))
+            return null==target
+        }
+
         return false
     }
 
@@ -44,14 +139,12 @@ export  class   Piece
 
         if(target)
         {
-            return 1==ret
+            return 1==ret//架炮
         }
         else
         {
             return 0==ret
         }
-
-        return false;
     }
 
     public  isCanWalkChe(p:cc.Vec2):boolean{

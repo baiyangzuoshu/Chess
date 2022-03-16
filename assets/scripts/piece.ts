@@ -3,6 +3,7 @@ import { GAME_ENUM, PIECE_STATE, PIECE_ID, PIECE_TYPE } from "./enum"
 
 export  class   Piece
 {
+    private _dbID:number=-1
     private _id:number=-1
     private _type:number=-1
     private _img:string=""
@@ -11,7 +12,8 @@ export  class   Piece
     private _node:cc.Node=null
     private _state:number=PIECE_STATE.NORMAL
 
-    public  init(id:number,type:number,img:string,x:number,y:number):void{
+    public  init(dbID:number,id:number,type:number,img:string,x:number,y:number):void{
+        this._dbID=dbID
         this._id=id
         this._type=type
         this._img=img
@@ -176,9 +178,19 @@ export  class   Piece
         }
     }
 
-    public  die():void{
+    public  isPieceByDbID(dbID:number):boolean{
+        return this._dbID==dbID
+    }
+
+    public  revive():void{
+        this._state=PIECE_STATE.NORMAL
+        this._node.active=true
+    }
+
+    public  die():number{
         this._state=PIECE_STATE.DIE
         this._node.active=false
+        return  this._dbID
     }
 
     public  setNode(node:cc.Node):void{
@@ -214,5 +226,9 @@ export  class   Piece
     }
     public  getId():number{
         return this._id
+    }
+
+    public  getDbID():number{
+        return this._dbID
     }
 }

@@ -58,7 +58,9 @@ export default class NewClass extends cc.Component {
             {
                 if(prePiece.getType()!=curPiece.getType()&&prePiece.isCanWalk(transformPos))//吃对方棋子
                 {
-                    curPiece.die()
+                    let dbID=curPiece.die()
+                    DataManager.getInstance().pushStep(prePiece.getDbID(),dbID,prePiece.getX(),prePiece.getY(),transformPos.x,transformPos.y)
+
                     prePiece.setX(transformPos.x)
                     prePiece.setY(transformPos.y)
                     this.hideSelectedNode()
@@ -70,6 +72,9 @@ export default class NewClass extends cc.Component {
             }
             else if(prePiece.isCanWalk(transformPos)&&PIECE_TYPE.OWN==prePiece.getType())//前进
             {
+                let dbID=0
+                DataManager.getInstance().pushStep(prePiece.getDbID(),dbID,prePiece.getX(),prePiece.getY(),transformPos.x,transformPos.y)
+
                 prePiece.setX(transformPos.x)
                 prePiece.setY(transformPos.y)
                 this.hideSelectedNode()
@@ -111,9 +116,31 @@ export default class NewClass extends cc.Component {
         }
     }
 
-    start () {
+    clickBtnEvent(event:cc.Event.EventTouch,data):void{
+        console.log(data)
+        if("regret"==data)
+        {
+            let step=DataManager.getInstance().popStep()
+            if(!step)return
 
+            let killId=step.getKillId()
+            let dbID=step.getDbID()
+            let fromX=step.getFromX()
+            let fromY=step.getFromY()
+            let toX=step.getToX()
+            let toY=step.getToY()
+            
+            let piece=DataManager.getInstance().getPieceByID(dbID)
+            let killPiece=DataManager.getInstance().getPieceByID(killId)
+            if(piece)
+            {
+                piece.setX(fromX)
+                piece.setY(fromY)
+            }
+            if(killPiece)
+            {
+                killPiece.revive()
+            }
+        }
     }
-
-    // update (dt) {}
 }

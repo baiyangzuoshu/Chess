@@ -1,8 +1,10 @@
 import { GAME_ENUM } from "./enum"
 import { Piece } from "./piece"
+import { Step } from "./step"
 
 export  class   DataManager
 {
+    private _stepArray:Array<Step>=[]
     private _pieceArray:Array<Piece>=[]
     private static  _instance:DataManager=null
     public  static  getInstance():DataManager{
@@ -11,6 +13,28 @@ export  class   DataManager
             this._instance=new DataManager()
         }
         return this._instance
+    }
+
+    public  getPieceByID(dbID:number):Piece{
+        for(let i=0;i<this._pieceArray.length;i++)
+        {
+            if(this._pieceArray[i].isPieceByDbID(dbID))
+            {
+                return this._pieceArray[i]
+            }
+        }
+
+        return null
+    }
+
+    public  pushStep(dbID:number,killId:number,fromX:number,fromY:number,toX:number,toY:number):void
+    {
+        let step=new Step(dbID,killId,fromX,fromY,toX,toY)
+        this._stepArray.push(step)
+    }
+
+    public  popStep():Step{
+        return  this._stepArray.pop()
     }
 
     public  pointTransform(p:cc.Vec2):cc.Vec2{
@@ -74,6 +98,7 @@ export  class   DataManager
         let data:Array<Object>=jsonData.json
         for(let i=0;i<data.length;i++)
         {
+            let dbID=data[i]["dbID"]
             let id=data[i]["id"]
             let type=data[i]["type"]
             let img=data[i]["img"]
@@ -81,7 +106,7 @@ export  class   DataManager
             let y=data[i]["y"]
 
             let piece=new Piece()
-            piece.init(id,type,img,x,y)
+            piece.init(dbID,id,type,img,x,y)
             this._pieceArray.push(piece)
         }
     }

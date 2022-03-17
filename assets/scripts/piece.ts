@@ -1,5 +1,5 @@
 import { DataManager } from "./dataManager"
-import { GAME_ENUM, PIECE_STATE, PIECE_ID, PIECE_TYPE, PIECE_SCORE, PIECE_DIE_SCORE } from "./enum"
+import { GAME_ENUM, PIECE_STATE, PIECE_ID, PIECE_TYPE, PIECE_DIE_SCORE } from "./enum"
 
 export  class   Piece
 {
@@ -154,57 +154,28 @@ export  class   Piece
     }
 
     public  isCanWalkZu(p:cc.Vec2):boolean{
-        if(p.x==this.getX())
+        if(PIECE_TYPE.OWN==this.getType())
         {
-            return p.y==this.getY()+1
+            //只能前进
+            if(p.y<this.getY())return false
+            //未过河之前，不可以左右横移
+            if(p.y<=GAME_ENUM.PIECE_OWN_ZU&&p.y==this.getY())return false
         }
-        else if(p.y==this.getY()){
-            if(PIECE_TYPE.OWN==this.getType())
-            {
-                if(this.getY()<GAME_ENUM.PIECE_OWN_ZU)
-                {
-                    return false;
-                }
-            }
-            else if(PIECE_TYPE.ENEMY==this.getType())
-            {
-                if(this.getY()<GAME_ENUM.PIECE_ENEMY_ZU)
-                {
-                    return false;
-                }
-            }
+        else if(PIECE_TYPE.ENEMY==this.getType())
+        {
+            if(p.y>this.getY())return false
 
-            return (p.x==this.getX()+1||p.x==this.getX()-1)
+            if(p.y>=GAME_ENUM.PIECE_ENEMY_ZU&&p.y==this.getY())return false
         }
+
+        let x=Math.abs(p.x-this.getX())
+        let y=Math.abs(p.y-this.getY())
+        let ret=x*10+y
+
+        return 1==ret||10==ret
     }
 
-    public  isPieceByDbID(dbID:number):boolean{
-        return this._dbID==dbID
-    }
-    //行走得分
     public  getScore():number{
-        switch(this.getId())
-        {
-            case PIECE_ID.CHE:
-                return  PIECE_SCORE.CHE
-            case PIECE_ID.JIANG:
-                return  PIECE_SCORE.JIANG
-            case PIECE_ID.MA:
-                return  PIECE_SCORE.MA
-            case PIECE_ID.PAO:
-                return  PIECE_SCORE.PAO
-            case PIECE_ID.SHI:
-                return  PIECE_SCORE.SHI
-            case PIECE_ID.XIANG:
-                return  PIECE_SCORE.XIANG
-            case PIECE_ID.ZU:
-                return  PIECE_SCORE.ZU
-            default:
-                return 0
-        }
-    }
-    //死亡得分
-    public  getDieScore():number{
         switch(this.getId())
         {
             case PIECE_ID.CHE:
@@ -212,18 +183,22 @@ export  class   Piece
             case PIECE_ID.JIANG:
                 return  PIECE_DIE_SCORE.JIANG
             case PIECE_ID.MA:
-                return  PIECE_DIE_SCORE.MA
+                return PIECE_DIE_SCORE.MA
             case PIECE_ID.PAO:
-                return  PIECE_DIE_SCORE.PAO
+                return PIECE_DIE_SCORE.PAO
             case PIECE_ID.SHI:
-                return  PIECE_DIE_SCORE.SHI
+                return PIECE_DIE_SCORE.SHI
             case PIECE_ID.XIANG:
-                return  PIECE_DIE_SCORE.XIANG
+                return PIECE_DIE_SCORE.XIANG
             case PIECE_ID.ZU:
-                return  PIECE_DIE_SCORE.ZU
+                return PIECE_DIE_SCORE.ZU
             default:
                 return 0
         }
+    }
+
+    public  isPieceByDbID(dbID:number):boolean{
+        return this._dbID==dbID
     }
 
     public  isActive():boolean{

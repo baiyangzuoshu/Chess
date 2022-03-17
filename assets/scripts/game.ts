@@ -5,8 +5,10 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
+import { AI } from "./AI"
 import { DataManager } from "./dataManager"
 import { GAME_ENUM, PIECE_TYPE } from "./enum"
+import { Step } from "./step"
 
 const {ccclass, property} = cc._decorator
 
@@ -21,6 +23,8 @@ export default class NewClass extends cc.Component {
     chessSpriteAtlas:cc.SpriteAtlas=null
     @property(cc.Node)
     selectedNode:cc.Node=null
+
+    isReturn:boolean=false
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
@@ -59,11 +63,14 @@ export default class NewClass extends cc.Component {
                 if(prePiece.getType()!=curPiece.getType()&&prePiece.isCanWalk(transformPos))//吃对方棋子
                 {
                     let dbID=curPiece.die()
-                    DataManager.getInstance().pushStep(prePiece.getDbID(),dbID,prePiece.getX(),prePiece.getY(),transformPos.x,transformPos.y)
+                    let step=new Step(prePiece.getDbID(),dbID,prePiece.getX(),prePiece.getY(),transformPos.x,transformPos.y)
+                    DataManager.getInstance().pushStep(step)
 
                     prePiece.setX(transformPos.x)
                     prePiece.setY(transformPos.y)
                     this.hideSelectedNode()
+
+                    this.isReturn=true
                 }
                 else
                 {
@@ -73,11 +80,14 @@ export default class NewClass extends cc.Component {
             else if(prePiece.isCanWalk(transformPos)&&PIECE_TYPE.OWN==prePiece.getType())//前进
             {
                 let dbID=0
-                DataManager.getInstance().pushStep(prePiece.getDbID(),dbID,prePiece.getX(),prePiece.getY(),transformPos.x,transformPos.y)
+                let step=new Step(prePiece.getDbID(),dbID,prePiece.getX(),prePiece.getY(),transformPos.x,transformPos.y)
+                DataManager.getInstance().pushStep(step)
 
                 prePiece.setX(transformPos.x)
                 prePiece.setY(transformPos.y)
                 this.hideSelectedNode()
+
+                this.isReturn=true
             }
         }
         else{
@@ -129,7 +139,7 @@ export default class NewClass extends cc.Component {
             let fromY=step.getFromY()
             let toX=step.getToX()
             let toY=step.getToY()
-            
+
             let piece=DataManager.getInstance().getPieceByID(dbID)
             let killPiece=DataManager.getInstance().getPieceByID(killId)
             if(piece)
@@ -140,6 +150,34 @@ export default class NewClass extends cc.Component {
             if(killPiece)
             {
                 killPiece.revive()
+            }
+        }
+    }
+
+    update(){
+        if(this.isReturn){
+            this.isReturn=false
+
+            let step=AI.getStep()
+            DataManager.getInstance().pushStep(step)
+
+            let dbID=step.getDbID()
+            let killId=step.getKillId()
+            let fromX=step.getFromX()
+            let fromY=step.getFromY()
+            let toX=step.getToX()
+            let toY=step.getToY()
+
+            let piece=DataManager.getInstance().getPieceByID(dbID)
+            let killPiece=DataManager.getInstance().getPieceByID(killId)
+            if(piece)
+            {
+                piece.setX(toX)
+                piece.setY(toY)
+            }
+            if(killPiece)
+            {
+                killPiece.die()
             }
         }
     }

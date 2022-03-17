@@ -1,5 +1,5 @@
 import { DataManager } from "./dataManager"
-import { GAME_ENUM, PIECE_STATE, PIECE_ID, PIECE_TYPE } from "./enum"
+import { GAME_ENUM, PIECE_STATE, PIECE_ID, PIECE_TYPE, PIECE_SCORE, PIECE_DIE_SCORE } from "./enum"
 
 export  class   Piece
 {
@@ -181,14 +181,61 @@ export  class   Piece
     public  isPieceByDbID(dbID:number):boolean{
         return this._dbID==dbID
     }
+    //行走得分
+    public  getScore():number{
+        switch(this.getId())
+        {
+            case PIECE_ID.CHE:
+                return  PIECE_SCORE.CHE
+            case PIECE_ID.JIANG:
+                return  PIECE_SCORE.JIANG
+            case PIECE_ID.MA:
+                return  PIECE_SCORE.MA
+            case PIECE_ID.PAO:
+                return  PIECE_SCORE.PAO
+            case PIECE_ID.SHI:
+                return  PIECE_SCORE.SHI
+            case PIECE_ID.XIANG:
+                return  PIECE_SCORE.XIANG
+            case PIECE_ID.ZU:
+                return  PIECE_SCORE.ZU
+            default:
+                return 0
+        }
+    }
+    //死亡得分
+    public  getDieScore():number{
+        switch(this.getId())
+        {
+            case PIECE_ID.CHE:
+                return  PIECE_DIE_SCORE.CHE
+            case PIECE_ID.JIANG:
+                return  PIECE_DIE_SCORE.JIANG
+            case PIECE_ID.MA:
+                return  PIECE_DIE_SCORE.MA
+            case PIECE_ID.PAO:
+                return  PIECE_DIE_SCORE.PAO
+            case PIECE_ID.SHI:
+                return  PIECE_DIE_SCORE.SHI
+            case PIECE_ID.XIANG:
+                return  PIECE_DIE_SCORE.XIANG
+            case PIECE_ID.ZU:
+                return  PIECE_DIE_SCORE.ZU
+            default:
+                return 0
+        }
+    }
 
+    public  isActive():boolean{
+        return  PIECE_STATE.NORMAL==this.getState()
+    }
     public  revive():void{
-        this._state=PIECE_STATE.NORMAL
+        this.setState(PIECE_STATE.NORMAL)
         this._node.active=true
     }
 
     public  die():number{
-        this._state=PIECE_STATE.DIE
+        this.setState(PIECE_STATE.DIE)
         this._node.active=false
         return  this._dbID
     }
@@ -199,7 +246,15 @@ export  class   Piece
 
     public  isPoint(p:cc.Vec2):boolean
     {
-        return  PIECE_STATE.NORMAL==this._state&&p.x==this._x&&p.y==this._y
+        return  PIECE_STATE.NORMAL==this.getState()&&p.x==this._x&&p.y==this._y
+    }
+
+    public  getState():number{
+        return this._state
+    }
+
+    public  setState(state:number):void{
+        this._state=state
     }
 
     public  setX(x:number):void{

@@ -27,9 +27,8 @@ export  class   DataManager
         return null
     }
 
-    public  pushStep(dbID:number,killId:number,fromX:number,fromY:number,toX:number,toY:number):void
+    public  pushStep(step:Step):void
     {
-        let step=new Step(dbID,killId,fromX,fromY,toX,toY)
         this._stepArray.push(step)
     }
 

@@ -17,21 +17,6 @@ export  class   Step
         this._toX=toX
         this._toY=toY
     }
-    //棋子步骤分数
-    public  getScore():number{
-        let score=0
-        //棋子行走分数
-        let piece=DataManager.getInstance().getPieceByID(this.getDbID())
-        score=score+piece.getScore()
-        //棋子被杀分数
-        let killedPiece=DataManager.getInstance().getPieceByID(this.getKillId())
-        if(killedPiece)
-        {
-            score=score+killedPiece.getDieScore()
-        }
-
-        return score
-    }
 
     public  getDbID():number
     {

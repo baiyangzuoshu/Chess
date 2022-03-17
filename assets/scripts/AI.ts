@@ -44,17 +44,87 @@ export  class   AI
     public  static  getStep():Step{
         let arr:Array<Step>=this.getAllPieceStep()
 
-        let maxScore=0
+        let maxScore=-10000
         let curStep=null
         for(let i=0;i<arr.length;i++)
         {
-            if(arr[i].getScore()>maxScore)
+            let step=arr[i]
+            AI.fakeMove(step)
+            let score=AI.getScore()
+            if(score>maxScore)
             {
-                maxScore=arr[i].getScore()
-                curStep=arr[i]
+                maxScore=score
+                curStep=step
             }
+            AI.unFakeMove(step)
         }
 
         return curStep
+    }
+    //获取得分
+    public  static  getScore():number{
+        let ownScore=0
+        let enemyScore=0
+        for(let dbID=GAME_ENUM.PIECE_OWN_MIN_DBID;dbID<=GAME_ENUM.PIECE_OWN_MAX_DBID;dbID++)
+        {
+            let piece=DataManager.getInstance().getPieceByID(dbID)
+            if(piece.isActive())
+            {
+                ownScore=ownScore+piece.getScore()
+            }
+        }
+
+        for(let dbID=GAME_ENUM.PIECE_ENEMY_MIN_DBID;dbID<=GAME_ENUM.PIECE_ENEMY_MAX_DBID;dbID++)
+        {
+            let piece=DataManager.getInstance().getPieceByID(dbID)
+            if(piece.isActive())
+            {
+                enemyScore=enemyScore+piece.getScore()
+            }
+        }
+
+        return enemyScore-ownScore
+    }
+    //模拟移动
+    public  static  fakeMove(step:Step):void{
+        let dbID=step.getDbID()
+        let killId=step.getKillId()
+        let fromX=step.getFromX()
+        let fromY=step.getFromY()
+        let toX=step.getToX()
+        let toY=step.getToY()
+
+        let piece=DataManager.getInstance().getPieceByID(dbID)
+        let killPiece=DataManager.getInstance().getPieceByID(killId)
+        if(piece)
+        {
+            piece.setX(toX)
+            piece.setY(toY)
+        }
+        if(killPiece)
+        {
+            killPiece.die()
+        }
+    }
+    //回退模拟
+    public  static  unFakeMove(step:Step):void{
+        let killId=step.getKillId()
+        let dbID=step.getDbID()
+        let fromX=step.getFromX()
+        let fromY=step.getFromY()
+        let toX=step.getToX()
+        let toY=step.getToY()
+
+        let piece=DataManager.getInstance().getPieceByID(dbID)
+        let killPiece=DataManager.getInstance().getPieceByID(killId)
+        if(piece)
+        {
+            piece.setX(fromX)
+            piece.setY(fromY)
+        }
+        if(killPiece)
+        {
+            killPiece.revive()
+        }
     }
 }

@@ -6,9 +6,23 @@ export  class   AI
 {
     //遍历棋子所有步骤
     private static   getAllPieceStep():Array<Step>{
-        let arr:Array<Step>=[];
+        let arr:Array<Step>=[]
 
-        for(let dbID=GAME_ENUM.PIECE_ENEMY_MIN_DBID;dbID<=GAME_ENUM.PIECE_ENEMY_MAX_DBID;dbID++)
+        let min=0
+        let max=0
+
+        if(DataManager.getInstance().getIsReturn())
+        {
+            min=GAME_ENUM.PIECE_ENEMY_MIN_DBID
+            max=GAME_ENUM.PIECE_ENEMY_MAX_DBID
+        }
+        else
+        {
+            min=GAME_ENUM.PIECE_OWN_MIN_DBID
+            max=GAME_ENUM.PIECE_OWN_MAX_DBID
+        }
+
+        for(let dbID=min;dbID<=max;dbID++)
         {
             let piece=DataManager.getInstance().getPieceByID(dbID)
             if(piece.isActive())
@@ -39,6 +53,70 @@ export  class   AI
             }
         }
         return arr
+    }
+    //智能多步
+    public  static  getSteps(level:number):Step{
+        let arr:Array<Step>=this.getAllPieceStep()
+
+        let maxScore=-10000
+        let curStep=null
+        for(let i=0;i<arr.length;i++)
+        {
+            let step=arr[i]
+            AI.fakeMove(step)
+            let score=AI.getMinScore(level-1)
+            if(score>maxScore)
+            {
+                maxScore=score
+                curStep=step
+            }
+            AI.unFakeMove(step)
+        }
+
+        return curStep
+    }
+
+    public  static  getMinScore(level):number{
+        if(0==level)//这最终的结果才决定
+            return AI.getScore()
+
+        let arr:Array<Step>=this.getAllPieceStep()
+
+        let minScore=10000
+        for(let i=0;i<arr.length;i++)
+        {
+            let step=arr[i]
+            AI.fakeMove(step)
+            let score=AI.getMaxScore(level-1)
+            if(score<minScore)
+            {
+                minScore=score
+            }
+            AI.unFakeMove(step)
+        }
+
+        return minScore
+    }
+
+    public  static  getMaxScore(level):number{
+        if(0==level)return AI.getScore()//这最终的结果才决定
+
+        let arr:Array<Step>=this.getAllPieceStep()
+
+        let maxScore=-10000
+        for(let i=0;i<arr.length;i++)
+        {
+            let step=arr[i]
+            AI.fakeMove(step)
+            let score=AI.getMinScore(level-1)
+            if(score>maxScore)
+            {
+                maxScore=score
+            }
+            AI.unFakeMove(step)
+        }
+
+        return maxScore
     }
     //最佳步骤
     public  static  getStep():Step{
@@ -105,6 +183,8 @@ export  class   AI
         {
             killPiece.die()
         }
+
+        DataManager.getInstance().updateIsReturn()
     }
     //回退模拟
     public  static  unFakeMove(step:Step):void{
@@ -126,5 +206,7 @@ export  class   AI
         {
             killPiece.revive()
         }
+
+        DataManager.getInstance().updateIsReturn()
     }
 }

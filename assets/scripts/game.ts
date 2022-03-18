@@ -24,7 +24,7 @@ export default class NewClass extends cc.Component {
     @property(cc.Node)
     selectedNode:cc.Node=null
 
-    isReturn:boolean=false
+    isAI:boolean=false
     // LIFE-CYCLE CALLBACKS:
 
     onLoad () {
@@ -70,7 +70,7 @@ export default class NewClass extends cc.Component {
                     prePiece.setY(transformPos.y)
                     this.hideSelectedNode()
 
-                    this.isReturn=true
+                    this.isAI=true
                 }
                 else
                 {
@@ -87,7 +87,7 @@ export default class NewClass extends cc.Component {
                 prePiece.setY(transformPos.y)
                 this.hideSelectedNode()
 
-                this.isReturn=true
+                this.isAI=true
             }
         }
         else{
@@ -155,8 +155,9 @@ export default class NewClass extends cc.Component {
     }
 
     update(){
-        if(this.isReturn){
-            this.isReturn=false
+        if(this.isAI){
+            this.isAI=false
+            DataManager.getInstance().updateIsReturn()
 
             let step=AI.getStep()
             DataManager.getInstance().pushStep(step)
@@ -179,6 +180,8 @@ export default class NewClass extends cc.Component {
             {
                 killPiece.die()
             }
+
+            DataManager.getInstance().updateIsReturn()
         }
     }
 }

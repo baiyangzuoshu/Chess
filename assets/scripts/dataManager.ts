@@ -7,12 +7,22 @@ export  class   DataManager
     private _stepArray:Array<Step>=[]
     private _pieceArray:Array<Piece>=[]
     private static  _instance:DataManager=null
+    private _isReturn:boolean=false
+
     public  static  getInstance():DataManager{
         if(null==this._instance)
         {
             this._instance=new DataManager()
         }
         return this._instance
+    }
+
+    public  updateIsReturn():void{
+        this._isReturn=!this._isReturn
+    }
+
+    public  getIsReturn():boolean{
+        return this._isReturn
     }
 
     public  getPieceByID(dbID:number):Piece{
